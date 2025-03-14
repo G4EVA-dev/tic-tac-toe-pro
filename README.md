@@ -2,7 +2,9 @@
 # Tic Tac Toe Web App
 
 ![image](https://github.com/user-attachments/assets/8c432628-3feb-4cb7-b8f9-30683efc8742)
-![Uploading image.png…]()
+--
+![image](https://github.com/user-attachments/assets/e3439353-43a3-44d7-8550-d09ec4e72ac9)
+
 
 
 A fully functional Tic Tac Toe web application that allows users to play against the computer (AI opponent), play against other users in multiplayer mode, and spectate ongoing games. The app is built with **React** for the frontend and **Express.js** for the backend, with **PostgreSQL** as the database. The entire application is Dockerized and deployed using **Render**.

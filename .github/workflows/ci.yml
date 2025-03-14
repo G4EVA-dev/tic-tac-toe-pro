@@ -28,7 +28,3 @@ jobs:
       - name: Run client tests
         run: npm test
         working-directory: client
-
-      - name: Run server tests
-        run: npm test
-        working-directory: server

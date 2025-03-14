@@ -1,7 +1,18 @@
-const { isValidMove } = require("../utils/gameLogic");
+// Define isValidMove locally instead of importing it
+// This ensures compatibility with your gameLogic.js
+const isValidMove = (board, row, col) => {
+  // Check if the cell is within bounds and empty
+  return row >= 0 && row < 3 && col >= 0 && col < 3 && board[row][col] === null;
+};
 
 // Simple AI implementation for Tic Tac Toe
 const getAiMove = (board, difficulty = "medium") => {
+  // Check if board is valid
+  if (!Array.isArray(board) || board.length !== 3) {
+    console.error("Invalid board format in getAiMove");
+    return null;
+  }
+
   switch (difficulty) {
     case "easy":
       return getRandomMove(board);
@@ -196,7 +207,7 @@ const evaluateBoard = (board) => {
   for (let i = 0; i < 3; i++) {
     // Check rows
     if (
-      board[i][0] &&
+      board[i][0] !== null &&
       board[i][0] === board[i][1] &&
       board[i][0] === board[i][2]
     ) {
@@ -205,7 +216,7 @@ const evaluateBoard = (board) => {
 
     // Check columns
     if (
-      board[0][i] &&
+      board[0][i] !== null &&
       board[0][i] === board[1][i] &&
       board[0][i] === board[2][i]
     ) {
@@ -215,7 +226,7 @@ const evaluateBoard = (board) => {
 
   // Check diagonals
   if (
-    board[0][0] &&
+    board[0][0] !== null &&
     board[0][0] === board[1][1] &&
     board[0][0] === board[2][2]
   ) {
@@ -223,7 +234,7 @@ const evaluateBoard = (board) => {
   }
 
   if (
-    board[0][2] &&
+    board[0][2] !== null &&
     board[0][2] === board[1][1] &&
     board[0][2] === board[2][0]
   ) {

@@ -1,123 +1,121 @@
-// Game board representation:
-// [
-//   [null, null, null],
-//   [null, null, null],
-//   [null, null, null]
-// ]
-// where null = empty, 'X' = player X, 'O' = player O
+/**
+ * Game logic utilities for tic-tac-toe
+ */
 
-// Initialize a new game board
-const initializeBoard = () => {
+// Initialize a new tic-tac-toe board (3x3 grid of null values)
+function initializeBoard() {
   return [
     [null, null, null],
     [null, null, null],
     [null, null, null],
   ];
-};
+}
 
-// Check if a move is valid
-const isValidMove = (board, row, col) => {
-  // Check if position is within bounds
+/**
+ * Make a move on the board
+ * @param {Array} board - Current game board
+ * @param {Number} row - Row index (0-2)
+ * @param {Number} col - Column index (0-2)
+ * @param {String} player - Player symbol ('X' or 'O')
+ * @returns {Object} Result containing success status and updated board
+ */
+function makeMove(board, row, col, player) {
+  // Validate row and column
   if (row < 0 || row > 2 || col < 0 || col > 2) {
-    return false;
+    return { success: false, message: "Invalid position" };
   }
 
-  // Check if position is empty
-  return board[row][col] === null;
-};
-
-// Make a move on the board
-const makeMove = (board, row, col, player) => {
-  if (!isValidMove(board, row, col)) {
-    return { success: false, board };
+  // Check if the cell is already occupied
+  if (board[row][col] !== null) {
+    return { success: false, message: "Cell already occupied" };
   }
 
-  // Create a deep copy of the board
-  const newBoard = JSON.parse(JSON.stringify(board));
+  // Make a copy of the board to avoid mutation
+  const newBoard = board.map((row) => [...row]);
+
+  // Place the move
   newBoard[row][col] = player;
 
   return { success: true, board: newBoard };
-};
+}
 
-// Check if there's a winner
-const checkWinner = (board) => {
+/**
+ * Check the game status
+ * @param {Array} board - Current game board
+ * @returns {Object} Game status (in_progress, finished) and winner (X, O, or null for draw)
+ */
+function getGameStatus(board) {
   // Check rows
   for (let i = 0; i < 3; i++) {
     if (
-      board[i][0] &&
+      board[i][0] !== null &&
       board[i][0] === board[i][1] &&
-      board[i][0] === board[i][2]
+      board[i][1] === board[i][2]
     ) {
-      return board[i][0];
+      return { status: "finished", winner: board[i][0] };
     }
   }
 
   // Check columns
   for (let i = 0; i < 3; i++) {
     if (
-      board[0][i] &&
+      board[0][i] !== null &&
       board[0][i] === board[1][i] &&
-      board[0][i] === board[2][i]
+      board[1][i] === board[2][i]
     ) {
-      return board[0][i];
+      return { status: "finished", winner: board[0][i] };
     }
   }
 
   // Check diagonals
   if (
-    board[0][0] &&
+    board[0][0] !== null &&
     board[0][0] === board[1][1] &&
-    board[0][0] === board[2][2]
+    board[1][1] === board[2][2]
   ) {
-    return board[0][0];
+    return { status: "finished", winner: board[0][0] };
   }
 
   if (
-    board[0][2] &&
+    board[0][2] !== null &&
     board[0][2] === board[1][1] &&
-    board[0][2] === board[2][0]
+    board[1][1] === board[2][0]
   ) {
-    return board[0][2];
+    return { status: "finished", winner: board[0][2] };
   }
 
-  return null;
-};
-
-// Check if the game is a draw
-const isDraw = (board) => {
-  // If there's no winner and no empty cells, it's a draw
-  return (
-    !checkWinner(board) &&
-    board.every((row) => row.every((cell) => cell !== null))
-  );
-};
-
-// Get game status
-const getGameStatus = (board) => {
-  const winner = checkWinner(board);
-
-  if (winner) {
-    return { status: "finished", winner };
+  // Check for draw (all cells filled)
+  let isDraw = true;
+  for (let i = 0; i < 3; i++) {
+    for (let j = 0; j < 3; j++) {
+      if (board[i][j] === null) {
+        isDraw = false;
+        break;
+      }
+    }
+    if (!isDraw) break;
   }
 
-  if (isDraw(board)) {
-    return { status: "draw", winner: null };
+  if (isDraw) {
+    return { status: "finished", winner: null };
   }
 
+  // Game is still in progress
   return { status: "in_progress", winner: null };
-};
+}
 
-// Switch player turn
-const switchPlayer = (currentPlayer) => {
+/**
+ * Switch the current player
+ * @param {String} currentPlayer - Current player ('X' or 'O')
+ * @returns {String} Next player
+ */
+function switchPlayer(currentPlayer) {
   return currentPlayer === "X" ? "O" : "X";
-};
+}
 
 module.exports = {
   initializeBoard,
-  isValidMove,
   makeMove,
-  checkWinner,
-  isDraw,
   getGameStatus,
   switchPlayer,
 };

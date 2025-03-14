@@ -39,6 +39,7 @@ class GameService {
       throw error;
     }
   }
+
   // Get game by ID
   static async getGameById(gameId) {
     try {
@@ -98,7 +99,7 @@ class GameService {
   // Make a move in the game
   static async makeMove(gameId, playerId, row, col) {
     try {
-      const game = await this.getById(gameId);
+      const game = await this.getGameById(gameId); // Fixed method name here
 
       if (!game) {
         return { success: false, message: "Game not found" };

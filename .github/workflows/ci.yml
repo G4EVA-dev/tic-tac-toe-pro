@@ -13,20 +13,22 @@ jobs:
         with:
           node-version: 16
 
-      # Install dependencies for both client and server
+      - name: Verify repository structure
+        run: ls -R
+        working-directory: .
+
       - name: Install dependencies for client
         run: npm install
-        working-directory: tic-tac-toe-pro/client
+        working-directory: client
 
       - name: Install dependencies for server
         run: npm install
-        working-directory: tic-tac-toe-pro/server
+        working-directory: server
 
-      # Run tests for both client and server
       - name: Run client tests
         run: npm test
-        working-directory: tic-tac-toe-pro/client
+        working-directory: client
 
       - name: Run server tests
         run: npm test
-        working-directory: tic-tac-toe-pro/server
+        working-directory: server

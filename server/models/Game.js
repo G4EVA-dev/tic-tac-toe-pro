@@ -129,9 +129,9 @@ class Game {
     try {
       const game = await db.oneOrNone(
         `
-        SELECT * FROM games 
-        WHERE id = $1 AND status = 'waiting' AND player_o IS NULL
-      `,
+            SELECT * FROM games 
+            WHERE id = $1 AND status = 'waiting' AND player_o IS NULL
+            `,
         [gameId]
       );
 
@@ -139,12 +139,23 @@ class Game {
         return { success: false, message: "Game not available to join" };
       }
 
-      // Parse the board back to an array
+      // 🛠 Ensure `board` is valid JSON before parsing
       try {
-        game.board = JSON.parse(game.board);
+        if (
+          typeof game.board === "string" &&
+          game.board.trim().startsWith("[")
+        ) {
+          game.board = JSON.parse(game.board);
+        } else {
+          console.warn("Invalid board format detected. Resetting board.");
+          game.board = [
+            [null, null, null],
+            [null, null, null],
+            [null, null, null],
+          ];
+        }
       } catch (error) {
         console.error("Error parsing board:", error);
-        // Reset the board to a valid state
         game.board = [
           [null, null, null],
           [null, null, null],
@@ -155,16 +166,31 @@ class Game {
       // Update the game with the new player
       const updatedGame = await db.one(
         `
-        UPDATE games
-        SET player_o = $1, status = 'in_progress'
-        WHERE id = $2
-        RETURNING *
-      `,
+            UPDATE games
+            SET player_o = $1, status = 'in_progress'
+            WHERE id = $2
+            RETURNING *
+            `,
         [playerOId, gameId]
       );
 
-      // Parse the board back to an array
-      updatedGame.board = JSON.parse(updatedGame.board);
+      // 🛠 Ensure `board` is valid JSON after update
+      try {
+        if (
+          typeof updatedGame.board === "string" &&
+          updatedGame.board.trim().startsWith("[")
+        ) {
+          updatedGame.board = JSON.parse(updatedGame.board);
+        }
+      } catch (error) {
+        console.error("Error parsing updated board:", error);
+        updatedGame.board = [
+          [null, null, null],
+          [null, null, null],
+          [null, null, null],
+        ];
+      }
+
       return { success: true, game: updatedGame };
     } catch (error) {
       console.error("Error joining game:", error);

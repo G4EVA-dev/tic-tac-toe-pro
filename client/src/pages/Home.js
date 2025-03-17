@@ -7,6 +7,7 @@ const Home = () => {
   const [gameId, setGameId] = useState("");
   const [loading, setLoading] = useState(false);
   const [notification, setNotification] = useState(null);
+  const [gameMode, setGameMode] = useState("friend"); // 'friend' or 'ai'
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -35,7 +36,10 @@ const Home = () => {
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ playerXId: playerId, isSinglePlayer: false }),
+          body: JSON.stringify({
+            playerXId: playerId,
+            isSinglePlayer: gameMode === "ai", // Set to true for AI mode
+          }),
         }
       );
       const game = await response.json();
@@ -97,13 +101,28 @@ const Home = () => {
     <div className="home-container">
       <div className="home-content">
         <h1 className="game-title">Tic Tac Toe</h1>
-        <div className="game-subtitle">Play with friends online!</div>
+        <div className="game-subtitle">Play with friends or AI!</div>
 
         {notification && (
           <div className={`notification ${notification.type}`}>
             {notification.message}
           </div>
         )}
+
+        <div className="mode-selector">
+          <button
+            className={`mode-button ${gameMode === "friend" ? "active" : ""}`}
+            onClick={() => setGameMode("friend")}
+          >
+            Play with a Friend
+          </button>
+          <button
+            className={`mode-button ${gameMode === "ai" ? "active" : ""}`}
+            onClick={() => setGameMode("ai")}
+          >
+            Play with AI
+          </button>
+        </div>
 
         <div className="action-buttons">
           <button
@@ -114,34 +133,41 @@ const Home = () => {
             {loading ? "Creating..." : "Create New Game"}
           </button>
 
-          <div className="divider">
-            <span>OR</span>
-          </div>
+          {gameMode === "friend" && (
+            <>
+              <div className="divider">
+                <span>OR</span>
+              </div>
 
-          <div className="join-game-container">
-            <input
-              type="text"
-              className="game-id-input"
-              placeholder="Enter Game ID"
-              value={gameId}
-              onChange={(e) => setGameId(e.target.value)}
-              disabled={loading}
-            />
-            <button
-              className="primary-button join-game"
-              onClick={joinGame}
-              disabled={loading}
-            >
-              {loading ? "Joining..." : "Join Game"}
-            </button>
-          </div>
+              <div className="join-game-container">
+                <input
+                  type="text"
+                  className="game-id-input"
+                  placeholder="Enter Game ID"
+                  value={gameId}
+                  onChange={(e) => setGameId(e.target.value)}
+                  disabled={loading}
+                />
+                <button
+                  className="primary-button join-game"
+                  onClick={joinGame}
+                  disabled={loading}
+                >
+                  {loading ? "Joining..." : "Join Game"}
+                </button>
+              </div>
+            </>
+          )}
         </div>
 
         <div className="game-instructions">
           <h3>How to play:</h3>
           <ol>
+            <li>Choose to play with a friend or AI</li>
             <li>Create a game or join an existing one</li>
-            <li>Share the game ID with your friend</li>
+            <li>
+              Share the game ID with your friend (if playing with a friend)
+            </li>
             <li>Take turns making moves</li>
             <li>Get three in a row to win!</li>
           </ol>

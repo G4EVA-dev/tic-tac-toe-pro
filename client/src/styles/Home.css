@@ -35,6 +35,37 @@
   font-size: 1.2rem;
 }
 
+.mode-selector {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  justify-content: center;
+}
+
+.mode-button {
+  background: #f0f0f0;
+  color: #555;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.mode-button.active {
+  background: #5271ff;
+  color: white;
+  box-shadow: 0 4px 10px rgba(82, 113, 255, 0.2);
+}
+
+.mode-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+}
+
 .action-buttons {
   display: flex;
   flex-direction: column;

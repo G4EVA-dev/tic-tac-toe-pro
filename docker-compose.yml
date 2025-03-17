@@ -16,6 +16,16 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
+  frontend:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    env_file:
+      - ./client/.env
   backend:
     build:
       context: ./server
@@ -25,7 +35,7 @@ services:
     depends_on:
       - postgres
     env_file:
-      - .env
+      - ./server/.env
     ports:
       - "5000:5000"
     volumes:

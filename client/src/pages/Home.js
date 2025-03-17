@@ -30,11 +30,14 @@ const Home = () => {
     try {
       setLoading(true);
       const playerId = Math.random().toString(36).substring(7);
-      const response = await fetch("http://localhost:5000/api/games/create", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ playerXId: playerId, isSinglePlayer: false }),
-      });
+      const response = await fetch(
+        `${process.env.REACT_APP_SOCKET_URL}/api/games/create`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ playerXId: playerId, isSinglePlayer: false }),
+        }
+      );
       const game = await response.json();
       navigate(`/game/${game.id}`, { state: { playerId } });
     } catch (error) {
@@ -62,7 +65,7 @@ const Home = () => {
       setLoading(true);
       const playerId = Math.random().toString(36).substring(7);
       const response = await fetch(
-        `http://localhost:5000/api/games/${gameId}/join`,
+        `${process.env.REACT_APP_SOCKET_URL}/api/games/${gameId}/join`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

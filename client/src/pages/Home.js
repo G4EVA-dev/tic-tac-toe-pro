@@ -31,7 +31,7 @@ const Home = () => {
       setLoading(true);
       const playerId = Math.random().toString(36).substring(7);
       const response = await fetch(
-        `${process.env.REACT_APP_SOCKET_URL}/api/games/create`,
+        `https://tic-tac-toe-mexico.onrender.com/api/games/create`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -65,7 +65,7 @@ const Home = () => {
       setLoading(true);
       const playerId = Math.random().toString(36).substring(7);
       const response = await fetch(
-        `${process.env.REACT_APP_SOCKET_URL}/api/games/${gameId}/join`,
+        `https://tic-tac-toe-mexico.onrender.com/api/games/${gameId}/join`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

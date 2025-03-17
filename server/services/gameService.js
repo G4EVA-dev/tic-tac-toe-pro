@@ -99,7 +99,7 @@ class GameService {
   // Make a move in the game
   static async makeMove(gameId, playerId, row, col) {
     try {
-      const game = await this.getGameById(gameId); // Fixed method name here
+      const game = await this.getGameById(gameId);
 
       if (!game) {
         return { success: false, message: "Game not found" };
@@ -132,7 +132,7 @@ class GameService {
         RETURNING *
         `,
         [
-          JSON.stringify(moveResult.board), // Serialize the board
+          JSON.stringify(moveResult.board),
           newCurrentPlayer,
           status === "in_progress" ? "in_progress" : "finished",
           winner ? (winner === "X" ? game.player_x : game.player_o) : null,
@@ -142,6 +142,15 @@ class GameService {
 
       // Parse the board back to an array
       updatedGame.board = JSON.parse(updatedGame.board);
+
+      // If it's a single-player game and the game is still in progress, make AI move
+      if (
+        updatedGame.player_o === "AI" &&
+        updatedGame.status === "in_progress"
+      ) {
+        await this.makeAiMove(gameId);
+      }
+
       return { success: true, game: updatedGame };
     } catch (error) {
       console.error("Error making move:", error);
@@ -152,28 +161,23 @@ class GameService {
   // Make an AI move in single-player mode
   static async makeAiMove(gameId) {
     try {
-      // Fetch the current game state
       const game = await this.getGameById(gameId);
 
       if (!game || game.status !== "in_progress" || game.player_o !== "AI") {
         return { success: false, message: "Invalid game for AI move" };
       }
 
-      // Get the AI's move
       const aiMove = getAiMove(game.board);
 
       if (!aiMove) {
         return { success: false, message: "AI could not determine a move" };
       }
 
-      // Make the AI's move
       const moveResult = makeMove(game.board, aiMove.row, aiMove.col, "O");
 
-      // Check the game status after the move
       const { status, winner } = getGameStatus(moveResult.board);
       const newCurrentPlayer = switchPlayer(game.current_player);
 
-      // Update the game in the database
       const updatedGame = await db.one(
         `
         UPDATE games
@@ -190,7 +194,7 @@ class GameService {
         ]
       );
 
-      // Parse the board from JSON string to actual array
+      // Parse the board back to an array
       updatedGame.board = JSON.parse(updatedGame.board);
 
       return { success: true, game: updatedGame };

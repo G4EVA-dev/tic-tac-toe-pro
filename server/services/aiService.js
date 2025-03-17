@@ -7,7 +7,6 @@ const isValidMove = (board, row, col) => {
 
 // Simple AI implementation for Tic Tac Toe
 const getAiMove = (board, difficulty = "medium") => {
-  // Check if board is valid
   if (!Array.isArray(board) || board.length !== 3) {
     console.error("Invalid board format in getAiMove");
     return null;
@@ -29,7 +28,6 @@ const getAiMove = (board, difficulty = "medium") => {
 const getRandomMove = (board) => {
   const availableMoves = [];
 
-  // Collect all available moves
   for (let row = 0; row < 3; row++) {
     for (let col = 0; col < 3; col++) {
       if (isValidMove(board, row, col)) {
@@ -38,7 +36,6 @@ const getRandomMove = (board) => {
     }
   }
 
-  // Return a random move from available moves
   if (availableMoves.length > 0) {
     const randomIndex = Math.floor(Math.random() * availableMoves.length);
     return availableMoves[randomIndex];
@@ -46,7 +43,6 @@ const getRandomMove = (board) => {
 
   return null; // No moves available
 };
-
 // Medium AI: Prioritizes winning and blocking
 const getMediumMove = (board) => {
   const aiPlayer = "O";

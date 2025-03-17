@@ -5,7 +5,7 @@ const GameBoard = ({ board, onCellClick, disabled, currentPlayer, winner }) => {
   const [lastMove, setLastMove] = useState(null);
 
   const handleClick = (rowIndex, colIndex) => {
-    if (board[rowIndex][colIndex] === null && !disabled) {
+    if (board[rowIndex][colIndex] === null && !disabled && !winner) {
       setLastMove({ row: rowIndex, col: colIndex });
       onCellClick(rowIndex, colIndex);
     }

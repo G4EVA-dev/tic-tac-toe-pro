@@ -17,6 +17,7 @@ class Game {
 
     // Serialize the board to JSON
     const boardJson = JSON.stringify(initialBoard);
+    console.log("Serialized board:", boardJson); // Debugging
 
     try {
       // Insert the game into the database
@@ -28,7 +29,7 @@ class Game {
         `,
         [
           gameId,
-          boardJson,
+          boardJson, // Use the serialized board
           "X",
           isSinglePlayer ? "in_progress" : "waiting",
           playerXId,
@@ -37,7 +38,15 @@ class Game {
       );
 
       // Deserialize the board before returning
-      result.board = JSON.parse(result.board);
+      try {
+        result.board = JSON.parse(result.board);
+        console.log("Deserialized board:", result.board); // Debugging
+      } catch (error) {
+        console.error("Error parsing board in create:", error);
+        // Reset the board to a valid state
+        result.board = initialBoard;
+      }
+
       return result;
     } catch (error) {
       console.error("Error creating game:", error);
@@ -56,9 +65,11 @@ class Game {
       );
 
       if (game) {
+        console.log("Raw board from database:", game.board); // Debugging
         // Deserialize the board
         try {
           game.board = JSON.parse(game.board);
+          console.log("Deserialized board:", game.board); // Debugging
         } catch (error) {
           console.error("Error parsing board in getById:", error);
           // Reset the board to a valid state

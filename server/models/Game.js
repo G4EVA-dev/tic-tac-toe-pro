@@ -8,28 +8,24 @@ class Game {
   static async create(playerXId, isSinglePlayer = false) {
     const gameId = uuidv4();
 
-    // Create a properly initialized board directly
+    // Initialize the board
     const initialBoard = [
       [null, null, null],
       [null, null, null],
       [null, null, null],
     ];
 
-    // Log the board before serialization to check its structure
-    console.log("Initial board structure:", initialBoard);
-
-    // Serialize the board with proper null handling
+    // Serialize the board to JSON
     const boardJson = JSON.stringify(initialBoard);
-    console.log("Serialized board:", boardJson);
 
     try {
       // Insert the game into the database
       const result = await db.one(
         `
-      INSERT INTO games (id, board, current_player, status, player_x, player_o)
-      VALUES ($1, $2, $3, $4, $5, $6)
-      RETURNING *
-      `,
+        INSERT INTO games (id, board, current_player, status, player_x, player_o)
+        VALUES ($1, $2, $3, $4, $5, $6)
+        RETURNING *
+        `,
         [
           gameId,
           boardJson,
@@ -40,19 +36,8 @@ class Game {
         ]
       );
 
-      // Log the inserted game
-      console.log("Inserted game:", result);
-
-      // Parse the board back to an array for the response
-      try {
-        console.log("Board from database:", result.board);
-        result.board = JSON.parse(result.board);
-      } catch (parseError) {
-        console.error("Error parsing board in create:", parseError);
-        // Use the initial board as a fallback
-        result.board = initialBoard;
-      }
-
+      // Deserialize the board before returning
+      result.board = JSON.parse(result.board);
       return result;
     } catch (error) {
       console.error("Error creating game:", error);
@@ -60,7 +45,6 @@ class Game {
     }
   }
 
-  // Get game by ID
   // Get game by ID
   static async getById(gameId) {
     try {
@@ -72,9 +56,8 @@ class Game {
       );
 
       if (game) {
+        // Deserialize the board
         try {
-          // Parse the board from JSON string to actual array
-          console.log("Raw board data from DB:", game.board);
           game.board = JSON.parse(game.board);
         } catch (error) {
           console.error("Error parsing board in getById:", error);
@@ -102,7 +85,7 @@ class Game {
         ORDER BY created_at DESC
       `);
 
-      // Parse the board for each game
+      // Deserialize the board for each game
       games.forEach((game) => {
         try {
           game.board = JSON.parse(game.board);
@@ -129,9 +112,9 @@ class Game {
     try {
       const game = await db.oneOrNone(
         `
-            SELECT * FROM games 
-            WHERE id = $1 AND status = 'waiting' AND player_o IS NULL
-            `,
+        SELECT * FROM games 
+        WHERE id = $1 AND status = 'waiting' AND player_o IS NULL
+        `,
         [gameId]
       );
 
@@ -139,23 +122,12 @@ class Game {
         return { success: false, message: "Game not available to join" };
       }
 
-      // 🛠 Ensure `board` is valid JSON before parsing
+      // Deserialize the board
       try {
-        if (
-          typeof game.board === "string" &&
-          game.board.trim().startsWith("[")
-        ) {
-          game.board = JSON.parse(game.board);
-        } else {
-          console.warn("Invalid board format detected. Resetting board.");
-          game.board = [
-            [null, null, null],
-            [null, null, null],
-            [null, null, null],
-          ];
-        }
+        game.board = JSON.parse(game.board);
       } catch (error) {
         console.error("Error parsing board:", error);
+        // Reset the board to a valid state
         game.board = [
           [null, null, null],
           [null, null, null],
@@ -166,31 +138,16 @@ class Game {
       // Update the game with the new player
       const updatedGame = await db.one(
         `
-            UPDATE games
-            SET player_o = $1, status = 'in_progress'
-            WHERE id = $2
-            RETURNING *
-            `,
+        UPDATE games
+        SET player_o = $1, status = 'in_progress'
+        WHERE id = $2
+        RETURNING *
+        `,
         [playerOId, gameId]
       );
 
-      // 🛠 Ensure `board` is valid JSON after update
-      try {
-        if (
-          typeof updatedGame.board === "string" &&
-          updatedGame.board.trim().startsWith("[")
-        ) {
-          updatedGame.board = JSON.parse(updatedGame.board);
-        }
-      } catch (error) {
-        console.error("Error parsing updated board:", error);
-        updatedGame.board = [
-          [null, null, null],
-          [null, null, null],
-          [null, null, null],
-        ];
-      }
-
+      // Deserialize the updated board
+      updatedGame.board = JSON.parse(updatedGame.board);
       return { success: true, game: updatedGame };
     } catch (error) {
       console.error("Error joining game:", error);
@@ -246,17 +203,8 @@ class Game {
         ]
       );
 
-      // Parse the board back to an array
+      // Deserialize the board before returning
       updatedGame.board = JSON.parse(updatedGame.board);
-
-      // If it's a single player game and the game is still in progress, make AI move
-      if (
-        updatedGame.player_o === "AI" &&
-        updatedGame.status === "in_progress"
-      ) {
-        return await this.makeAiMove(gameId);
-      }
-
       return { success: true, game: updatedGame };
     } catch (error) {
       console.error("Error making move:", error);
@@ -304,7 +252,7 @@ class Game {
         ]
       );
 
-      // Parse the board back to an array
+      // Deserialize the board before returning
       updatedGame.board = JSON.parse(updatedGame.board);
       return { success: true, game: updatedGame };
     } catch (error) {
@@ -369,7 +317,7 @@ class Game {
         [playerId]
       );
 
-      // Parse the board for each game
+      // Deserialize the board for each game
       games.forEach((game) => {
         try {
           game.board = JSON.parse(game.board);

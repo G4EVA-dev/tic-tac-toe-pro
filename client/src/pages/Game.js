@@ -37,7 +37,9 @@ const Game = () => {
     socket.emit("joinRoom", { gameId, playerId });
 
     socket.on("gameState", (game) => {
-      setBoard(game.board);
+      // Ensure the board is properly parsed
+      const parsedBoard = JSON.parse(game.board);
+      setBoard(parsedBoard);
       setCurrentPlayer(game.current_player);
 
       if (game.playerX === playerId) {

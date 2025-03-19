@@ -17,7 +17,7 @@ const server = http.createServer(app);
 // Set up CORS middleware
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "http://localhost:3000",
+    origin: "https://tic-tac-toe-pro-inky.vercel.app/",
     credentials: true,
   })
 );
@@ -32,7 +32,7 @@ app.use(sessionMiddleware);
 // Set up Socket.IO with CORS
 const io = socketIO(server, {
   cors: {
-    origin: process.env.CLIENT_URL || "http://localhost:3000",
+    origin: "https://tic-tac-toe-pro-inky.vercel.app/",
     methods: ["GET", "POST"],
     credentials: true,
   },

@@ -1,7 +1,8 @@
 
 # Tic Tac Toe Web App
 
-![image](https://github.com/user-attachments/assets/8c432628-3feb-4cb7-b8f9-30683efc8742)
+![image](https://github.com/user-attachments/assets/15a0faf4-46fd-4415-8be5-263ff9ef19d8)
+
 --
 ![image](https://github.com/user-attachments/assets/e3439353-43a3-44d7-8550-d09ec4e72ac9)
 
